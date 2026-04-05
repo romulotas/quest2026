@@ -668,7 +668,17 @@ let supabaseKey = '';
 let isOnline = false;
 let isSyncing = false;
 
+// === SUAS CREDENCIAIS AQUI ===
+const EMBEDDED_URL = 'https://tptgkwnyazxliiqikipp.supabase.co';  // Cole sua URL: 'https://xxxxx.supabase.co'
+const EMBEDDED_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwdGdrd255YXp4bGlpcWlraXBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNTk3NzUsImV4cCI6MjA5MDkzNTc3NX0.3YEyh-X86vSsbM2LjulW_iVlKg77Ky6P3TaPFkF2nzw';  // Cole sua anon key: 'eyJhbGciOi...'
+// =============================
+
 function loadConfig() {
+  if (EMBEDDED_URL && EMBEDDED_KEY) {
+    supabaseUrl = EMBEDDED_URL;
+    supabaseKey = EMBEDDED_KEY;
+    return true;
+  }
   try {
     const cfg = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
     supabaseUrl = cfg.url || '';
