@@ -1,2 +1,1467 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ QUEST 2026 — Rômulo</title>
+<meta name="description" content="Quest 2026 - Sistema gamificado de produtividade pessoal">
+<meta name="theme-color" content="#0a0a14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0a14;
+  --bg-mid: #12121f;
+  --bg-card: rgba(255,255,255,0.03);
+  --bg-card-hover: rgba(255,255,255,0.055);
+  --border: rgba(255,255,255,0.06);
+  --text-primary: #e8ecf4;
+  --text-secondary: #8892a8;
+  --text-muted: #555e72;
+  --accent-indigo: #7c7ff9;
+  --accent-purple: #b97cfa;
+  --accent-pink: #f472b6;
+  --accent-green: #34d399;
+  --accent-amber: #fbbf24;
+  --accent-red: #f87171;
+  --saude: #34d399;
+  --carreira: #7c7ff9;
+  --ingles: #fbbf24;
+  --foco: #f472b6;
+  --conexoes: #b97cfa;
+  --font-main: 'Outfit', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,127,249,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(244,114,182,0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ===== SYNC STATUS ===== */
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  transition: all 0.3s;
+}
+
+.sync-status.online { color: var(--accent-green); background: rgba(52,211,153,0.1); }
+.sync-status.offline { color: var(--accent-amber); background: rgba(251,191,36,0.1); }
+.sync-status.syncing { color: var(--accent-indigo); background: rgba(124,127,249,0.1); }
+.sync-status.error { color: var(--accent-red); background: rgba(248,113,113,0.1); }
+
+.sync-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.sync-status.online .sync-dot { background: var(--accent-green); }
+.sync-status.offline .sync-dot { background: var(--accent-amber); }
+.sync-status.syncing .sync-dot { background: var(--accent-indigo); animation: pulse 1s infinite; }
+.sync-status.error .sync-dot { background: var(--accent-red); }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ===== HEADER ===== */
+.header {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brand h1 {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple), var(--accent-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.brand-sub p {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.week-nav .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.week-nav button {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.week-nav button:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+.week-num {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-purple);
+  min-width: 36px;
+  text-align: center;
+}
+
+/* ===== LEVEL BAR ===== */
+.level-section { margin-top: 18px; }
+
+.level-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.level-badge .badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.level-badge .name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.xp-count {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.xp-count span { color: var(--text-muted); }
+
+.xp-float {
+  position: absolute;
+  right: 0;
+  top: -20px;
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  animation: floatUp 0.9s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-22px); }
+}
+
+.level-bar {
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.level-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent-indigo), var(--accent-purple), var(--accent-pink));
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== STAT CARDS ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 10px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.stat-card:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
+.stat-card .stat-icon { font-size: 16px; margin-bottom: 4px; }
+.stat-card .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--text-primary); }
+.stat-card .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-top: 2px; }
+
+/* ===== TABS ===== */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 3px;
+  border: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 11px 8px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-main);
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.tab-btn.active {
+  background: rgba(124,127,249,0.15);
+  color: var(--accent-purple);
+}
+
+.tab-btn:hover:not(.active) { color: var(--text-secondary); }
+
+/* ===== TRACKER ===== */
+.tab-content { margin-top: 20px; }
+
+.category-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+  transition: all 0.2s;
+}
+
+.category-card:hover { border-color: rgba(255,255,255,0.1); }
+
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cat-header-left .cat-icon { font-size: 20px; }
+.cat-header-left .cat-name { font-weight: 800; font-size: 14px; }
+
+.streak-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+}
+
+.tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+.table-scroll { overflow-x: auto; }
+.table-scroll::-webkit-scrollbar { height: 3px; }
+.table-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+.tracker-table th {
+  padding: 10px 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tracker-table th:first-child { padding-left: 18px; text-align: left; }
+.tracker-table th.today-col { color: var(--accent-purple); }
+.tracker-table th:last-child { padding-right: 14px; }
+
+.tracker-table td {
+  padding: 7px 6px;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.02);
+}
+
+.tracker-table td:first-child {
+  padding-left: 18px;
+  text-align: left;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.task-xp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.check-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 2px solid rgba(255,255,255,0.1);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+  position: relative;
+}
+
+.check-btn:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); }
+
+.check-btn.checked {
+  border: none;
+  animation: checkPop 0.25s ease;
+}
+
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.check-btn.checked::after {
+  content: '✓';
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.td-xp {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  padding-right: 14px !important;
+}
+
+/* ===== ROADMAP ===== */
+.roadmap { padding-left: 28px; position: relative; }
+
+.roadmap-line {
+  position: absolute;
+  left: 13px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  border-radius: 2px;
+}
+
+.milestone { position: relative; margin-bottom: 24px; }
+
+.milestone-dot {
+  position: absolute;
+  left: -22px;
+  top: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid var(--bg-deep);
+}
+
+.milestone-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-left: 8px;
+}
+
+.milestone-card h3 {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.milestone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.milestone-item .dot { flex-shrink: 0; margin-top: 2px; }
+
+.milestone-final .milestone-card {
+  background: linear-gradient(135deg, rgba(124,127,249,0.07), rgba(244,114,182,0.07));
+}
+
+/* ===== RULES ===== */
+.rule-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.rule-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.rule-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+
+/* ===== EXPORT BAR ===== */
+.export-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.export-btn {
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.export-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: rgba(255,255,255,0.12); }
+.export-btn.danger { border-color: rgba(248,113,113,0.2); color: var(--accent-red); }
+.export-btn.danger:hover { background: rgba(248,113,113,0.08); }
+
+/* ===== SETUP SCREEN ===== */
+.setup-screen {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.setup-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+
+.setup-card h2 {
+  font-size: 20px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.setup-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.setup-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.setup-input:focus { border-color: var(--accent-indigo); }
+.setup-input::placeholder { color: var(--text-muted); }
+
+.setup-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.setup-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.setup-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,127,249,0.3); }
+
+.setup-skip {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+}
+
+.setup-skip:hover { color: var(--text-secondary); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent-green);
+  color: #0a0a14;
+  padding: 10px 24px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 13px;
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .brand h1 { font-size: 22px; }
+  .header { padding: 20px 0 16px; }
+  .tabs { font-size: 11px; }
+  .tab-btn { padding: 10px 4px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+// QUEST 2026 — Supabase + Offline Fallback
+// =============================================
+
+// ===== CONFIGURAÇÃO SUPABASE =====
+const CONFIG_KEY = 'quest2026_config';
+const LOCAL_KEY = 'quest2026_data';
+const PENDING_KEY = 'quest2026_pending';
+
+let supabaseUrl = '';
+let supabaseKey = '';
+let isOnline = false;
+let isSyncing = false;
+
+function loadConfig() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+    supabaseUrl = cfg.url || '';
+    supabaseKey = cfg.key || '';
+    return !!(supabaseUrl && supabaseKey);
+  } catch { return false; }
+}
+
+function saveConfig(url, key) {
+  supabaseUrl = url.replace(/\/$/, '');
+  supabaseKey = key;
+  localStorage.setItem(CONFIG_KEY, JSON.stringify({ url: supabaseUrl, key: supabaseKey }));
+}
+
+// ===== SUPABASE REST API =====
+async function supaFetch(table, method, params = {}) {
+  if (!supabaseUrl || !supabaseKey) return null;
+  
+  let url = `${supabaseUrl}/rest/v1/${table}`;
+  const headers = {
+    'apikey': supabaseKey,
+    'Authorization': `Bearer ${supabaseKey}`,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'resolution=merge-duplicates,return=minimal' : 'return=minimal'
+  };
+
+  const opts = { method, headers };
+
+  if (params.query) {
+    url += '?' + params.query;
+  }
+
+  if (params.body) {
+    opts.body = JSON.stringify(params.body);
+  }
+
+  try {
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error(`${res.status}`);
+    const text = await res.text();
+    return text ? JSON.parse(text) : true;
+  } catch (e) {
+    console.warn('Supabase fetch error:', e);
+    return null;
+  }
+}
+
+async function testConnection() {
+  if (!supabaseUrl || !supabaseKey) return false;
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/quest_meta?key=eq.current_week&select=*`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`,
+      }
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+// ===== SYNC ENGINE =====
+async function pullFromCloud() {
+  if (!supabaseUrl) return null;
+  
+  try {
+    // Fetch all checks
+    const checks = await supaFetch('quest_checks', 'GET', {
+      query: 'select=week_num,day_index,task_id,completed'
+    });
+
+    // Fetch meta
+    const meta = await supaFetch('quest_meta', 'GET', {
+      query: 'select=key,value'
+    });
+
+    if (!checks || !meta) return null;
+
+    // Convert to local format
+    const weeks = {};
+    checks.forEach(row => {
+      if (!weeks[row.week_num]) weeks[row.week_num] = {};
+      weeks[row.week_num][`${row.day_index}-${row.task_id}`] = row.completed;
+    });
+
+    const currentWeek = parseInt((meta.find(m => m.key === 'current_week') || {}).value || '1');
+
+    return { weeks, currentWeek };
+  } catch (e) {
+    console.warn('Pull error:', e);
+    return null;
+  }
+}
+
+async function pushToCloud(weekNum, key, completed) {
+  if (!supabaseUrl) {
+    addPending({ weekNum, key, completed });
+    return;
+  }
+
+  const parts = key.split('-');
+  const dayIndex = parseInt(parts[0]);
+  const taskId = parts.slice(1).join('-');
+
+  if (completed) {
+    const res = await supaFetch('quest_checks', 'POST', {
+      body: { week_num: weekNum, day_index: dayIndex, task_id: taskId, completed: true }
+    });
+    if (!res) addPending({ weekNum, key, completed });
+  } else {
+    const res = await supaFetch('quest_checks', 'DELETE', {
+      query: `week_num=eq.${weekNum}&day_index=eq.${dayIndex}&task_id=eq.${taskId}`
+    });
+    if (!res) addPending({ weekNum, key, completed });
+  }
+}
+
+async function pushMetaToCloud(key, value) {
+  if (!supabaseUrl) return;
+  await supaFetch('quest_meta', 'POST', {
+    body: { key, value: String(value) }
+  });
+}
+
+function addPending(op) {
+  const pending = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]');
+  pending.push({ ...op, timestamp: Date.now() });
+  localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+}
+
+async function flushPending() {
+  const pending = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]');
+  if (pending.length === 0) return;
+  
+  const remaining = [];
+  for (const op of pending) {
+    const parts = op.key.split('-');
+    const dayIndex = parseInt(parts[0]);
+    const taskId = parts.slice(1).join('-');
+
+    let success;
+    if (op.completed) {
+      success = await supaFetch('quest_checks', 'POST', {
+        body: { week_num: op.weekNum, day_index: dayIndex, task_id: taskId, completed: true }
+      });
+    } else {
+      success = await supaFetch('quest_checks', 'DELETE', {
+        query: `week_num=eq.${op.weekNum}&day_index=eq.${dayIndex}&task_id=eq.${taskId}`
+      });
+    }
+    if (!success) remaining.push(op);
+  }
+  localStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
+}
+
+async function fullSync() {
+  if (!supabaseUrl || isSyncing) return;
+  isSyncing = true;
+  updateSyncStatus('syncing');
+
+  try {
+    // First flush pending operations
+    await flushPending();
+
+    // Pull from cloud
+    const cloudData = await pullFromCloud();
+    if (cloudData) {
+      // Merge: cloud wins for existing data, local fills gaps
+      const localData = loadLocalState();
+      const merged = { ...localData, weeks: { ...localData.weeks } };
+
+      Object.entries(cloudData.weeks).forEach(([wk, checks]) => {
+        if (!merged.weeks[wk]) merged.weeks[wk] = {};
+        Object.entries(checks).forEach(([key, val]) => {
+          merged.weeks[wk][key] = val;
+        });
+      });
+
+      state = { ...merged, activeTab: state.activeTab };
+      saveLocalState(state);
+      isOnline = true;
+      updateSyncStatus('online');
+    } else {
+      updateSyncStatus('error');
+    }
+  } catch (e) {
+    console.warn('Sync error:', e);
+    updateSyncStatus('error');
+  }
+  
+  isSyncing = false;
+  render();
+}
+
+function updateSyncStatus(status) {
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  const labels = { online: '● Sincronizado', offline: '● Modo Offline', syncing: '● Sincronizando...', error: '● Erro de conexão' };
+  el.className = `sync-status ${status}`;
+  el.innerHTML = `<span class="sync-dot"></span>${labels[status] || ''}`;
+}
+
+// ===== LOCAL STATE =====
+function loadLocalState() {
+  try {
+    const saved = localStorage.getItem(LOCAL_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return { weeks: {}, currentWeek: 1, activeTab: 'tracker' };
+}
+
+function saveLocalState(s) {
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(s));
+}
+
+let state = loadLocalState();
+
+// ===== DATA =====
+const CATEGORIES = {
+  saude: {
+    label: 'Saúde', icon: '💪', color: 'var(--saude)',
+    tasks: [
+      { id: 'treino', label: 'Treino na academia', xp: 15 },
+      { id: 'sono', label: '7-8h de sono', xp: 10 },
+      { id: 'cozinha', label: 'Cozinhou saudável', xp: 10 },
+      { id: 'agua', label: 'Bebeu 2L+ de água', xp: 5 },
+    ]
+  },
+  carreira: {
+    label: 'Carreira', icon: '🚀', color: 'var(--carreira)',
+    tasks: [
+      { id: 'estudo_tech', label: 'Estudo técnico (1h+)', xp: 20 },
+      { id: 'projeto', label: 'Trabalhou no projeto pessoal', xp: 15 },
+      { id: 'linkedin', label: 'Networking / LinkedIn', xp: 10 },
+    ]
+  },
+  ingles: {
+    label: 'Inglês', icon: '🌎', color: 'var(--ingles)',
+    tasks: [
+      { id: 'ingles_pratica', label: 'Prática de inglês (25min+)', xp: 15 },
+      { id: 'ingles_imersao', label: 'Imersão (podcast/vídeo EN)', xp: 10 },
+    ]
+  },
+  foco: {
+    label: 'Foco & Mente', icon: '🧠', color: 'var(--foco)',
+    tasks: [
+      { id: 'redes_limite', label: 'Redes sociais < 1h no dia', xp: 15 },
+      { id: 'jogos_limite', label: 'Jogos < 30min (ou zero)', xp: 10 },
+      { id: 'planejamento', label: 'Planejou o dia (5min)', xp: 5 },
+      { id: 'leitura', label: 'Leu algo útil (15min+)', xp: 10 },
+    ]
+  },
+  conexoes: {
+    label: 'Conexões', icon: '💜', color: 'var(--conexoes)',
+    tasks: [
+      { id: 'familia', label: 'Ligou/mandou msg pra família', xp: 10 },
+      { id: 'amigos', label: 'Conversou com amigo(a)', xp: 10 },
+      { id: 'presenca', label: 'Momento qualidade (sem celular)', xp: 10 },
+    ]
+  }
+};
+
+const DAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
+const LEVELS = [
+  { level: 1, name: 'Novato', minXP: 0 },
+  { level: 2, name: 'Iniciante', minXP: 200 },
+  { level: 3, name: 'Aprendiz', minXP: 500 },
+  { level: 4, name: 'Praticante', minXP: 1000 },
+  { level: 5, name: 'Dedicado', minXP: 1800 },
+  { level: 6, name: 'Consistente', minXP: 2800 },
+  { level: 7, name: 'Avançado', minXP: 4000 },
+  { level: 8, name: 'Mestre', minXP: 5500 },
+  { level: 9, name: 'Lenda', minXP: 7500 },
+  { level: 10, name: 'Melhor Versão', minXP: 10000 },
+];
+
+const MILESTONES = [
+  { month: 2, label: 'Mês 2 — Fundação', color: 'var(--saude)', items: [
+    'Rotina estabilizada', 'Diagnósticos em andamento', 'Inglês: hábito diário criado', 'Primeiras streaks de 7+ dias'
+  ]},
+  { month: 3, label: 'Mês 3 — Tração', color: 'var(--carreira)', items: [
+    'Resultados das investigações', 'Inglês: conversação básica fluida', 'Estudo técnico consistente 3x/sem', 'Procrastinação visivelmente menor'
+  ]},
+  { month: 6, label: 'Mês 6 — Colheita', color: 'var(--ingles)', items: [
+    'Saúde tratada e sob controle', 'Currículo atualizado p/ Data Engineer', 'Inglês: entrevistas em EN possíveis', 'Candidaturas ativas (R$8k-15k+)', 'Projeto pessoal gerando receita'
+  ]},
+];
+
+// ===== CALCULATIONS =====
+function getWeekChecks(wk) { return state.weeks[wk] || {}; }
+
+function calcWeekXP(wk) {
+  const checks = getWeekChecks(wk);
+  let xp = 0;
+  Object.entries(checks).forEach(([key, done]) => {
+    if (!done) return;
+    const taskId = key.split('-').slice(1).join('-');
+    for (const cat of Object.values(CATEGORIES)) {
+      const task = cat.tasks.find(t => t.id === taskId);
+      if (task) { xp += task.xp; break; }
+    }
+  });
+  return xp;
+}
+
+function calcTotalXP() {
+  return Object.keys(state.weeks).reduce((sum, wk) => sum + calcWeekXP(parseInt(wk)), 0);
+}
+
+function getLevel(xp) {
+  let current = LEVELS[0];
+  for (const l of LEVELS) { if (xp >= l.minXP) current = l; else break; }
+  const ni = LEVELS.findIndex(l => l.level === current.level) + 1;
+  return { current, next: ni < LEVELS.length ? LEVELS[ni] : null };
+}
+
+function calcStreaks(wk) {
+  const checks = getWeekChecks(wk);
+  const s = {};
+  Object.keys(CATEGORIES).forEach(ck => {
+    let streak = 0;
+    for (let d = 0; d < 7; d++) {
+      if (CATEGORIES[ck].tasks.some(t => checks[`${d}-${t.id}`])) streak++;
+      else streak = 0;
+    }
+    s[ck] = streak;
+  });
+  return s;
+}
+
+function todayIdx() { const d = new Date().getDay(); return d === 0 ? 6 : d - 1; }
+
+function todayPct(wk) {
+  const checks = getWeekChecks(wk);
+  const di = todayIdx();
+  let total = 0, done = 0;
+  Object.values(CATEGORIES).forEach(cat => {
+    cat.tasks.forEach(t => { total++; if (checks[`${di}-${t.id}`]) done++; });
+  });
+  return total ? Math.round((done / total) * 100) : 0;
+}
+
+// ===== TOAST =====
+let toastTimeout;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ===== EXPORT =====
+function exportJSON() {
+  const data = { ...state, exportedAt: new Date().toISOString(), categories: CATEGORIES };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  dl(blob, `quest2026_${fmtDate()}.json`);
+  showToast('📦 JSON exportado!');
+}
+
+function exportCSV() {
+  let csv = 'Semana,Dia,Categoria,Tarefa,XP_Possível,Concluída,XP_Ganho\n';
+  Object.entries(state.weeks).forEach(([wk, checks]) => {
+    DAYS.forEach((day, di) => {
+      Object.entries(CATEGORIES).forEach(([, cat]) => {
+        cat.tasks.forEach(task => {
+          const done = checks[`${di}-${task.id}`] ? 1 : 0;
+          csv += `${wk},${day},${cat.label},${task.label},${task.xp},${done},${done * task.xp}\n`;
+        });
+      });
+    });
+  });
+  dl(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }), `quest2026_${fmtDate()}.csv`);
+  showToast('📊 CSV exportado!');
+}
+
+function dl(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function fmtDate() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.weeks && confirm('Substituir todos os dados atuais?')) {
+          state.weeks = data.weeks;
+          state.currentWeek = data.currentWeek || 1;
+          saveLocalState(state);
+          // Push everything to cloud
+          if (supabaseUrl) syncFullPush();
+          render();
+          showToast('✅ Dados importados!');
+        }
+      } catch(err) { alert('Erro: ' + err.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+async function syncFullPush() {
+  // Push all local data to cloud
+  for (const [wk, checks] of Object.entries(state.weeks)) {
+    for (const [key, val] of Object.entries(checks)) {
+      if (val) {
+        const parts = key.split('-');
+        await supaFetch('quest_checks', 'POST', {
+          body: { week_num: parseInt(wk), day_index: parseInt(parts[0]), task_id: parts.slice(1).join('-'), completed: true }
+        });
+      }
+    }
+  }
+}
+
+function resetData() {
+  if (confirm('⚠️ Apagar TODOS os dados? Exporte antes!\n\nIsso inclui dados locais e na nuvem.')) {
+    if (confirm('Última chance! Realmente apagar?')) {
+      // Clear local
+      localStorage.removeItem(LOCAL_KEY);
+      localStorage.removeItem(PENDING_KEY);
+      state = { weeks: {}, currentWeek: 1, activeTab: 'tracker' };
+      
+      // Clear cloud
+      if (supabaseUrl) {
+        supaFetch('quest_checks', 'DELETE', { query: 'id=gt.0' });
+        supaFetch('quest_meta', 'POST', { body: { key: 'current_week', value: '1' } });
+      }
+      
+      render();
+      showToast('🗑️ Dados resetados');
+    }
+  }
+}
+
+function disconnectCloud() {
+  if (confirm('Desconectar do Supabase? Seus dados locais serão mantidos.')) {
+    localStorage.removeItem(CONFIG_KEY);
+    supabaseUrl = '';
+    supabaseKey = '';
+    isOnline = false;
+    render();
+    showToast('☁️ Desconectado');
+  }
+}
+
+// ===== ACTIONS =====
+function changeWeek(delta) {
+  state.currentWeek = Math.max(1, state.currentWeek + delta);
+  saveLocalState(state);
+  pushMetaToCloud('current_week', state.currentWeek);
+  render();
+}
+
+function switchTab(tab) {
+  state.activeTab = tab;
+  saveLocalState(state);
+  render();
+}
+
+function toggleCheck(weekNum, key, xp) {
+  const checks = getWeekChecks(weekNum);
+  const wasChecked = checks[key];
+  
+  if (!state.weeks[weekNum]) state.weeks[weekNum] = {};
+  state.weeks[weekNum][key] = !wasChecked;
+  
+  if (!state.weeks[weekNum][key]) delete state.weeks[weekNum][key];
+  
+  saveLocalState(state);
+  pushToCloud(weekNum, key, !wasChecked);
+  render();
+
+  if (!wasChecked) {
+    const anchor = document.getElementById('xp-float-anchor');
+    if (anchor) {
+      const f = document.createElement('div');
+      f.className = 'xp-float';
+      f.textContent = `+${xp}`;
+      anchor.appendChild(f);
+      setTimeout(() => f.remove(), 1000);
+    }
+  }
+}
+
+// ===== SETUP SCREEN =====
+function renderSetup() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="setup-screen">
+      <div style="text-align:center;margin-bottom:32px">
+        <h1 style="font-size:32px;font-weight:900;background:linear-gradient(135deg,var(--accent-indigo),var(--accent-purple),var(--accent-pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent">⚡ QUEST 2026</h1>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:4px">Configuração inicial</p>
+      </div>
+      <div class="setup-card">
+        <h2>☁️ Conectar ao Supabase</h2>
+        <p>Para sincronizar seus dados entre dispositivos, conecte ao seu projeto Supabase. Se ainda não criou, siga o guia que acompanha este arquivo.</p>
+        
+        <label class="setup-label">URL do Projeto</label>
+        <input class="setup-input" id="setup-url" placeholder="https://xxxxx.supabase.co" />
+        
+        <label class="setup-label">Anon Key (pública)</label>
+        <input class="setup-input" id="setup-key" placeholder="eyJhbGciOiJI..." />
+        
+        <button class="setup-btn" onclick="doSetup()">Conectar e Começar</button>
+        <button class="setup-skip" onclick="skipSetup()">Usar apenas offline (sem sincronização)</button>
+      </div>
+    </div>
+  `;
+}
+
+async function doSetup() {
+  const url = document.getElementById('setup-url').value.trim();
+  const key = document.getElementById('setup-key').value.trim();
+
+  if (!url || !key) {
+    showToast('⚠️ Preencha URL e Key');
+    return;
+  }
+
+  saveConfig(url, key);
+  const ok = await testConnection();
+  
+  if (ok) {
+    isOnline = true;
+    showToast('✅ Conectado ao Supabase!');
+    await fullSync();
+    render();
+  } else {
+    showToast('❌ Falha na conexão. Verifique URL e Key.');
+    localStorage.removeItem(CONFIG_KEY);
+    supabaseUrl = '';
+    supabaseKey = '';
+  }
+}
+
+function skipSetup() {
+  saveConfig('skip', 'skip');
+  render();
+}
+
+// ===== RENDER =====
+function render() {
+  const configured = loadConfig();
+  const skipped = supabaseUrl === 'skip';
+  
+  if (!configured && !skipped) {
+    renderSetup();
+    return;
+  }
+
+  const wk = state.currentWeek;
+  const checks = getWeekChecks(wk);
+  const weekXP = calcWeekXP(wk);
+  const totalXP = calcTotalXP();
+  const { current: lvl, next: nextLvl } = getLevel(totalXP);
+  const progress = nextLvl ? ((totalXP - lvl.minXP) / (nextLvl.minXP - lvl.minXP)) * 100 : 100;
+  const streaks = calcStreaks(wk);
+  const maxStreak = Math.max(0, ...Object.values(streaks));
+  const todayPercent = todayPct(wk);
+  const totalWeeks = Object.keys(state.weeks).length;
+  const di = todayIdx();
+
+  const syncClass = skipped ? 'offline' : (isOnline ? 'online' : 'offline');
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="header">
+      <div class="header-top">
+        <div class="brand">
+          <h1>⚡ QUEST 2026</h1>
+          <div class="brand-sub">
+            <p>Melhor Versão — Rômulo</p>
+            <span class="sync-status ${syncClass}" id="sync-indicator">
+              <span class="sync-dot"></span>
+              ${skipped ? 'Modo Offline' : (isOnline ? 'Sincronizado' : 'Offline')}
+            </span>
+          </div>
+        </div>
+        <div class="week-nav">
+          <span class="label">Semana</span>
+          <button onclick="changeWeek(-1)">‹</button>
+          <span class="week-num">${wk}</span>
+          <button onclick="changeWeek(1)">›</button>
+        </div>
+      </div>
+
+      <div class="level-section">
+        <div class="level-info">
+          <div class="level-badge">
+            <span class="badge">Nv.${lvl.level}</span>
+            <span class="name">${lvl.name}</span>
+          </div>
+          <div style="position:relative">
+            <span class="xp-count">${totalXP} XP${nextLvl ? ` <span>/ ${nextLvl.minXP}</span>` : ''}</span>
+            <div id="xp-float-anchor"></div>
+          </div>
+        </div>
+        <div class="level-bar">
+          <div class="level-bar-fill" style="width:${Math.min(progress, 100)}%"></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-value">${weekXP}</div><div class="stat-label">XP Semana</div></div>
+        <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-value">${todayPercent}%</div><div class="stat-label">Hoje</div></div>
+        <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value">${maxStreak}d</div><div class="stat-label">Streak</div></div>
+        <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value">${totalWeeks}</div><div class="stat-label">Semanas</div></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn ${state.activeTab==='tracker'?'active':''}" onclick="switchTab('tracker')">📋 Semana</button>
+      <button class="tab-btn ${state.activeTab==='roadmap'?'active':''}" onclick="switchTab('roadmap')">🗺️ Roadmap</button>
+      <button class="tab-btn ${state.activeTab==='regras'?'active':''}" onclick="switchTab('regras')">📖 Regras</button>
+      <button class="tab-btn ${state.activeTab==='export'?'active':''}" onclick="switchTab('export')">💾 Dados</button>
+    </div>
+
+    <div class="tab-content">
+      ${state.activeTab === 'tracker' ? renderTracker(wk, checks, streaks, di) : ''}
+      ${state.activeTab === 'roadmap' ? renderRoadmap() : ''}
+      ${state.activeTab === 'regras' ? renderRules() : ''}
+      ${state.activeTab === 'export' ? renderExport() : ''}
+    </div>
+  `;
+}
+
+function renderTracker(wk, checks, streaks, todayDi) {
+  let html = '';
+  Object.entries(CATEGORIES).forEach(([ck, cat]) => {
+    const streak = streaks[ck];
+    html += `
+      <div class="category-card">
+        <div class="cat-header">
+          <div class="cat-header-left">
+            <span class="cat-icon">${cat.icon}</span>
+            <span class="cat-name" style="color:${cat.color}">${cat.label}</span>
+          </div>
+          ${streak > 0 ? `<span class="streak-badge" style="color:var(--accent-amber);background:rgba(251,191,36,0.1)">🔥 ${streak}d</span>` : ''}
+        </div>
+        <div class="table-scroll">
+          <table class="tracker-table">
+            <thead><tr>
+              <th>Tarefa</th>
+              ${DAYS.map((d, i) => `<th class="${i===todayDi?'today-col':''}">${d}</th>`).join('')}
+              <th>XP</th>
+            </tr></thead>
+            <tbody>
+              ${cat.tasks.map(task => {
+                const cnt = DAYS.filter((_, di) => checks[`${di}-${task.id}`]).length;
+                return `<tr>
+                  <td>${task.label}<span class="task-xp">+${task.xp}</span></td>
+                  ${DAYS.map((_, di) => {
+                    const key = `${di}-${task.id}`;
+                    const chk = checks[key];
+                    return `<td><button class="check-btn ${chk?'checked':''}" style="${chk?`background:linear-gradient(135deg,${cat.color},${cat.color}cc)`:''}" onclick="toggleCheck(${wk},'${key}',${task.xp})"></button></td>`;
+                  }).join('')}
+                  <td class="td-xp" style="color:${cat.color}">${cnt * task.xp}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  });
+  return html;
+}
+
+function renderRoadmap() {
+  return `
+    <div class="roadmap">
+      <div class="roadmap-line" style="background:linear-gradient(180deg,var(--carreira),var(--ingles),var(--saude),var(--accent-purple))"></div>
+      ${MILESTONES.map(ms => `
+        <div class="milestone">
+          <div class="milestone-dot" style="background:${ms.color};box-shadow:0 0 12px ${ms.color}44"></div>
+          <div class="milestone-card" style="border:1px solid ${ms.color}33">
+            <h3 style="color:${ms.color}">${ms.label}</h3>
+            ${ms.items.map(i => `<div class="milestone-item"><span class="dot" style="color:${ms.color}">◆</span><span>${i}</span></div>`).join('')}
+          </div>
+        </div>
+      `).join('')}
+      <div class="milestone milestone-final">
+        <div class="milestone-dot" style="background:linear-gradient(135deg,var(--accent-purple),var(--accent-pink));box-shadow:0 0 16px rgba(185,124,250,0.4)"></div>
+        <div class="milestone-card" style="border:1px solid rgba(185,124,250,0.2)">
+          <h3 style="background:linear-gradient(135deg,var(--accent-purple),var(--accent-pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent">🏆 Final de 2026 — Melhor Versão</h3>
+          ${['Saúde física e mental sob controle','Posição de Data Engineer (R$8k-15k+)','Inglês fluente para trabalho','Projeto pessoal gerando renda extra','Estabilidade financeira e emocional'].map(i => `<div class="milestone-item"><span class="dot" style="color:var(--accent-purple)">★</span><span style="color:var(--text-primary);font-weight:500">${i}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderRules() {
+  const s = [
+    { title: '⚡ Sistema de XP', lines: ['Cada tarefa concluída dá XP. Tarefas mais difíceis = mais XP.', 'XP acumula semana a semana. Avance de nível mantendo consistência.', 'Não precisa completar tudo todo dia. Foco na tendência, não na perfeição.'] },
+    { title: '🔥 Streaks', lines: ['1+ tarefa da categoria por dia consecutivo = streak.', 'Quebrou? Recomeça sem culpa. Streaks motivam, não obrigam.'] },
+    { title: '📅 Rotina Sugerida', lines: ['Seg/Ter/Qui — Academia + 25min inglês + 1h estudo à noite', 'Qua (home office) — Cozinhar + 25min inglês + estudo se sobrar', 'Sex — Dia leve. Avaliação neuro + inglês + descanso', 'Sáb — Bloco de estudo (1h30-2h) + projeto pessoal', 'Dom — Cozinhar + descanso + imersão inglês leve'] },
+    { title: '🛡️ Regras de Ouro', lines: ['SONO: 7-8h inegociáveis. Nunca troque sono por estudo.', '2 MINUTOS: Abra o material por 2 min só. O difícil é começar.', 'SEM CULPA: Dia ruim não zera progresso.', 'REDIRECIONE: Saiu do foco? Sem julgamento, volta.', 'DESCANSO É XP: Descansar é parte do sistema.'] },
+    { title: '📱 Tela Saudável', lines: ['Redes sociais: meta < 1h/dia somando todas.', 'Jogos: < 30min ou zero. Recompensa, não refúgio.', 'Dica: deslogue das redes, modo foco, app de estudo na home.'] },
+  ];
+  return s.map(sec => `<div class="rule-card"><h3>${sec.title}</h3>${sec.lines.map(l => `<p>${l}</p>`).join('')}</div>`).join('');
+}
+
+function renderExport() {
+  const totalChecks = Object.values(state.weeks).reduce((s, wk) => s + Object.values(wk).filter(Boolean).length, 0);
+  const pending = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]').length;
+  const isCloud = supabaseUrl && supabaseUrl !== 'skip';
+
+  return `
+    <div class="rule-card">
+      <h3>📊 Seus Dados</h3>
+      <p>Semanas registradas: <strong>${Object.keys(state.weeks).length}</strong></p>
+      <p>Tarefas concluídas: <strong>${totalChecks}</strong></p>
+      <p>XP total: <strong>${calcTotalXP()}</strong></p>
+      ${pending > 0 ? `<p style="color:var(--accent-amber)">⏳ Operações pendentes de sync: <strong>${pending}</strong></p>` : ''}
+      <p style="margin-top:12px;color:var(--text-muted);font-size:12px">
+        ${isCloud ? '☁️ Dados sincronizados com Supabase + backup local.' : '💾 Dados salvos localmente no navegador.'}
+      </p>
+    </div>
+
+    <div class="export-bar">
+      <button class="export-btn" onclick="exportCSV()">📊 Exportar CSV</button>
+      <button class="export-btn" onclick="exportJSON()">📦 Exportar JSON</button>
+      <button class="export-btn" onclick="importData()">📥 Importar JSON</button>
+      ${isCloud ? `<button class="export-btn" onclick="fullSync()">🔄 Forçar Sync</button>` : ''}
+      ${isCloud ? `<button class="export-btn" onclick="disconnectCloud()">☁️ Desconectar Nuvem</button>` : `<button class="export-btn" onclick="reconnectCloud()">☁️ Conectar Nuvem</button>`}
+      <button class="export-btn danger" onclick="resetData()">🗑️ Resetar Tudo</button>
+    </div>
+
+    <div class="rule-card" style="margin-top:14px">
+      <h3>💡 Dicas</h3>
+      <p><strong>CSV</strong> — Abra no Pandas, Excel ou Sheets para análise.</p>
+      <p><strong>JSON</strong> — Backup completo. Restaure em qualquer dispositivo.</p>
+      <p><strong>Sync</strong> — Dados sincronizam automaticamente. Use "Forçar Sync" se algo parecer desatualizado.</p>
+    </div>`;
+}
+
+function reconnectCloud() {
+  localStorage.removeItem(CONFIG_KEY);
+  supabaseUrl = '';
+  supabaseKey = '';
+  renderSetup();
+}
+
+// ===== INIT =====
+async function init() {
+  const hasConfig = loadConfig();
+  
+  if (hasConfig && supabaseUrl !== 'skip') {
+    render();
+    // Async sync on load
+    const ok = await testConnection();
+    if (ok) {
+      isOnline = true;
+      await fullSync();
+    } else {
+      isOnline = false;
+    }
+    render();
+  } else {
+    render();
+  }
+
+  // Periodic sync every 60s
+  setInterval(async () => {
+    if (supabaseUrl && supabaseUrl !== 'skip') {
+      await flushPending();
+    }
+  }, 60000);
+
+  // Sync on visibility change (user comes back to tab)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && supabaseUrl && supabaseUrl !== 'skip') {
+      fullSync();
+    }
+  });
+}
+
+init();
+</script>
+</body>
 </html>
